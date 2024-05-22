@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: myapp_production
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    command: bash -c "rm -f tmp/pids/server.pid && ./bin/rails server -b 0.0.0.0"
+    volumes:
+      - .:/rails
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres:password@db:5432/myapp_production
+      RAILS_ENV: production
+      SECRET_KEY_BASE: 9c01d286e4441078610e35de669db7dd50ecf443f384f285fba1a44debb241900468584ae6c4c1136d89cd3483696cf90c17e39152bbf93a3531bf08316f5d6c
+
+volumes:
+  db_data:
